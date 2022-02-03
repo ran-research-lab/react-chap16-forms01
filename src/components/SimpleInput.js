@@ -43,6 +43,20 @@ const SimpleInput = (props) => {
     setEnteredName("");
   };
 
+  // L204 (A) the blur handler sets the touched to true
+  //          and also validates the input
+
+  const nameInputBlurHandler = (event) => {
+    console.log("You blurring me: " + event.target.value);
+    setEnteredNameTouched(true);
+
+    if (enteredName.trim() === "") {
+      console.log("setEnteredNameIsValid --> false");
+      setEnteredNameIsValid(false);
+      return;
+    }
+  };
+
   // L203 (C) now is invalid is combo of two conditions
   const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
 
@@ -57,11 +71,13 @@ const SimpleInput = (props) => {
       {/* L202 (E) the variable nameInputClasses controls the style of the form*/}
       <div className={nameInputClasses}>
         <label htmlFor="name">Your Name</label>
+        {/* L204 (B) need to set the onBlur trigger */}
         <input
           ref={nameInputRef}
           type="text"
           id="name"
           onChange={nameInputChangeHandler}
+          onBlur={nameInputBlurHandler}
           value={enteredName}
         />
       </div>
