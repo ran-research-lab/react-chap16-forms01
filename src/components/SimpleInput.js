@@ -9,6 +9,8 @@ const SimpleInput = (props) => {
   // L203 (B) create a state to monitor if touched
   const [enteredNameTouched, setEnteredNameTouched] = useState(false);
 
+  // const [formIsValid, setFormIsValid] = useState(false);
+
   // L203 (A) If enteredNameIsValid is true from the beginning,
   //          then this action would be run at the beginning :-(
   // useEffect(() => {
@@ -19,6 +21,19 @@ const SimpleInput = (props) => {
 
   // L205 (B) We refactored the validation functions to this..
   const enteredNameIsValid = enteredName.trim() !== "";
+
+  // L206 (B) For a form that has more components we would have a more
+  //          complex expression
+  let formIsValid = enteredNameIsValid;
+
+  // useEffect(() => {
+  //   // L206 (A) set the overall form validity
+  //   if (enteredNameIsValid) {
+  //     setFormIsValid(true);
+  //   } else {
+  //     setFormIsValid(false);
+  //   }
+  // }, [enteredNameIsValid]);
 
   const nameInputChangeHandler = (event) => {
     setEnteredName(event.target.value);
@@ -96,7 +111,7 @@ const SimpleInput = (props) => {
         <p className="error-text">Name must not be empty.</p>
       )}
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   );
