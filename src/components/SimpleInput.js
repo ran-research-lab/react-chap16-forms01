@@ -1,117 +1,41 @@
 import { useState } from "react";
+import useInput from "../hooks/use-input";
 
 const SimpleInput = (props) => {
-  const [enteredName, setEnteredName] = useState("");
+  const {
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: nameInputHasError,
+    valueChangedHandler: nameChangedHandler,
+    valueBlurHandler: nameBlurHandler,
+    reset: resetNameInput
+  } = useInput((value) => value.trim() !== "");
 
-  // L202. (A) create a state for the validity of the input
-  // const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: emailInputHasError,
+    valueChangedHandler: emailChangedHandler,
+    valueBlurHandler: emailBlurHandler,
+    reset: resetEmailInput
+  } = useInput((value) => value.includes("@"));
 
-  // L203 (B) create a state to monitor if touched
-  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
-
-  // const [formIsValid, setFormIsValid] = useState(false);
-
-  // L203 (A) If enteredNameIsValid is true from the beginning,
-  //          then this action would be run at the beginning :-(
-  // useEffect(() => {
-  //   if (enteredNameIsValid) {
-  //     console.log("Name input is valid");
-  //   }
-  // }, [enteredNameIsValid]);
-
-  const [enteredEmail, setEnteredEmail] = useState("");
-  // L205 (B) We refactored the validation functions to this..
-  const enteredNameIsValid = enteredName.trim() !== "";
-  const enteredEmailIsValid = enteredEmail.includes("@");
-
-  // L206 (B) For a form that has more components we would have a more
-  //          complex expression
-  let formIsValid = enteredNameIsValid && enteredEmailIsValid;
-
-  // useEffect(() => {
-  //   // L206 (A) set the overall form validity
-  //   if (enteredNameIsValid) {
-  //     setFormIsValid(true);
-  //   } else {
-  //     setFormIsValid(false);
-  //   }
-  // }, [enteredNameIsValid]);
-
-  const nameInputChangeHandler = (event) => {
-    setEnteredName(event.target.value);
-    // L205 (A) Important to check the parameter instead of the state
-    //          because the state is scheduled and not immediately available
-    // if (event.target.value.trim() !== "") {
-    //   setEnteredNameIsValid(true);
-    // }
-  };
-
-  // L202. (A) create a state for the validity of the input
-  // const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
-
-  // L203 (B) create a state to monitor if touched
-  const [enteredEmailTouched, setEnteredEmailTouched] = useState(false);
-
-  const emailInputChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
-  };
-
-  const emailInputBlurHandler = (event) => {
-    setEnteredEmailTouched(true);
-    console.log(enteredEmail, enteredEmailIsValid);
-  };
+  let formIsValid = enteredEmailIsValid && enteredNameIsValid; //enteredNameIsValid && enteredEmailIsValid;
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-    // L203 (D) Any time that the user submits, we consider it touched
-    setEnteredNameTouched(true);
 
-    // L202 (B) conditional to determine validity, if not
-    // valid then change state to false
-    // if (enteredName.trim() === "") {
-    //   console.log("setEnteredNameIsValid --> false");
-    //   setEnteredNameIsValid(false);
-    //   return;
-    // }
-
-    // L205 (C) We still want to avoid submitting if invalid, but now
-    //          now we use the deduced variable
     if (!enteredNameIsValid || !enteredEmailIsValid) return;
 
-    // L202 (C) change the state to true if valid
-    // setEnteredNameIsValid(true);
-
-    setEnteredName("");
-    setEnteredEmail("");
-
-    // L205 (D) Once the form is submitted it should acta as untouched
-    setEnteredNameTouched(false);
-    setEnteredEmailTouched(false);
+    resetNameInput();
+    resetEmailInput();
   };
 
-  // L204 (A) the blur handler sets the touched to true
-  //          and also validates the input
-
-  const nameInputBlurHandler = (event) => {
-    // console.log("You blurring me: " + event.target.value);
-    setEnteredNameTouched(true);
-
-    // if (enteredName.trim() === "") {
-    //   setEnteredNameIsValid(false);
-    // }
-  };
-
-  // L203 (C) now is invalid is combo of two conditions
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
-  const emailInputIsInvalid = !enteredEmailIsValid && enteredEmailTouched;
-
-  // L202 (D) you may choose to change the style of the form
-  // depending on validity
-  const nameInputClasses = nameInputIsInvalid
+  const nameInputClasses = nameInputHasError
     ? "form-control invalid"
     : "form-control";
 
-  const emailInputClasses = emailInputIsInvalid
+  const emailInputClasses = emailInputHasError
     ? "form-control invalid"
     : "form-control";
 
@@ -124,8 +48,8 @@ const SimpleInput = (props) => {
         <input
           type="text"
           id="name"
-          onChange={nameInputChangeHandler}
-          onBlur={nameInputBlurHandler}
+          onChange={nameChangedHandler}
+          onBlur={nameBlurHandler}
           value={enteredName}
         />
       </div>
@@ -135,18 +59,18 @@ const SimpleInput = (props) => {
         <input
           type="text"
           id="name"
-          onChange={emailInputChangeHandler}
-          onBlur={emailInputBlurHandler}
+          onChange={emailChangedHandler}
+          onBlur={emailBlurHandler}
           value={enteredEmail}
         />
       </div>
 
       {/* L202 (F) and the state controls if the message shows */}
       {/* L203 (C) we use the new combo condition */}
-      {nameInputIsInvalid && (
+      {nameInputHasError && (
         <p className="error-text">Name must not be empty.</p>
       )}
-      {emailInputIsInvalid && (
+      {emailInputHasError && (
         <p className="error-text">Email must not be empty.</p>
       )}
       <div className="form-actions">
